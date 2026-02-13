@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Pet Shop Impacta - Gestão Completa</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            /* Configuração da Imagem de Fundo */
+            background-image: url('cute-pet-accessories-still-life-concept.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+            min-height: 100vh;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.92);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            backdrop-filter: blur(8px);
+        }
+
+        h2 { text-align: center; color: #2c3e50; margin-bottom: 20px; }
+        label { display: block; margin-top: 15px; font-weight: bold; color: #444; }
+
+        input, select {
+            width: 100%; padding: 12px; margin-top: 5px;
+            border: 1px solid #ccc; border-radius: 8px;
+            box-sizing: border-box; font-size: 16px;
+        }
+
+        .btn-principal {
+            width: 100%; padding: 14px; background-color: #28a745; color: white;
+            border: none; border-radius: 8px; cursor: pointer;
+            font-weight: bold; margin-top: 25px; font-size: 16px;
+            transition: 0.3s;
+        }
+
+        #lista-pets { margin-top: 30px; }
+
+        .pet-item {
+            background: rgba(255, 255, 255, 0.95);
+            margin-bottom: 12px; padding: 15px; border-radius: 10px;
+            display: flex; justify-content: space-between; align-items: center;
+            border-left: 8px solid #28a745; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .acoes-btn { display: flex; gap: 8px; }
+
+        .btn-edit { background: #ffc107; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; }
+        .btn-del { background: #dc3545; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>🐾 Dinho's Pet Shop</h2>
+
+    <label>Nome do Pet</label>
+    <input type="text" id="nome" placeholder="Ex: Blunt">
+
+    <label>Tipo de Animal</label>
+    <select id="especie">
+        <option value="Cachorro">Cachorro 🐶</option>
+        <option value="Gato">Gato 🐱</option>
+    </select>
+
+    <label>Nome do Dono</label>
+    <input type="text" id="dono" placeholder="Ex: Dinho">
+
+    <button id="btn-acao" class="btn-principal" onclick="processarPet()">Realizar Cadastro</button>
+</div>
+
+<div id="lista-pets">
+    <h3 style="color: white; text-shadow: 1px 1px 4px rgba(0,0,0,0.5);">📋 Pets Cadastrados:</h3>
+    <ul id="pets-ul" style="padding: 0;"></ul>
+</div>
+
+<script>
+    const API_URL = "http://127.0.0.1:8000/pets/";
+    let idEmEdicao = null;
+
+    async function listarPets() {
+        try {
+            const response = await fetch(API_URL);
+            const pets = await response.json();
+            const ul = document.getElementById('pets-ul');
+            ul.innerHTML = '';
+
+            pets.forEach(pet => {
+                const icone = pet.especie === 'Cachorro' ? '🐶' : '🐱';
+                const li = document.createElement('li');
+                li.className = 'pet-item';
+                li.innerHTML = `
+                    <div>
+                        <strong>${icone} ${pet.nome}</strong><br>
+                        <small>Proprietário: ${pet.dono}</small>
+                    </div>
+                    <div class="acoes-btn">
+                        <button class="btn-edit" onclick="prepararEdicao(${pet.id}, '${pet.nome}', '${pet.especie}', '${pet.dono}')">✏️</button>
+                        <button class="btn-del" onclick="excluirPet(${pet.id})">🗑️</button>
+                    </div>
+                `;
+                ul.appendChild(li);
+            });
+        } catch (error) {
+            console.error("Erro ao listar:", error);
+        }
+    }
+
+    async function processarPet() {
+        const nome = document.getElementById('nome').value;
+        const especie = document.getElementById('especie').value;
+        const dono = document.getElementById('dono').value;
+
+        if (!nome || !dono) { alert("Preencha todos os campos!"); return; }
+
+        const metodo = idEmEdicao ? 'PUT' : 'POST';
+        const urlFinal = idEmEdicao ? `${API_URL}${idEmEdicao}` : API_URL;
+        const queryParams = `?nome=${nome}&especie=${especie}&dono=${dono}`;
+
+        try {
+            const response = await fetch(urlFinal + queryParams, { method: metodo });
+            if (response.ok) {
+                alert(idEmEdicao ? "Atualizado com sucesso!" : "Cadastrado com sucesso!");
+                cancelarEdicao();
+                listarPets();
+            }
+        } catch (error) {
+            alert("Erro de conexão com o servidor!");
+        }
+    }
+
+    function prepararEdicao(id, nome, especie, dono) {
+        idEmEdicao = id;
+        document.getElementById('nome').value = nome;
+        document.getElementById('especie').value = especie;
+        document.getElementById('dono').value = dono;
+
+        const btn = document.getElementById('btn-acao');
+        btn.textContent = "Salvar Alterações";
+        btn.style.backgroundColor = "#ffc107";
+        btn.style.color = "#000";
+        window.scrollTo(0, 0); // Sobe a página para o formulário
+    }
+
+    function cancelarEdicao() {
+        idEmEdicao = null;
+        document.getElementById('nome').value = '';
+        document.getElementById('dono').value = '';
+        const btn = document.getElementById('btn-acao');
+        btn.textContent = "Cadastrar no Banco de Dados";
+        btn.style.backgroundColor = "#28a745";
+        btn.style.color = "#fff";
+    }
+
+    async function excluirPet(id) {
+        if (confirm("Deseja remover este pet da lista?")) {
+            await fetch(`${API_URL}${id}`, { method: 'DELETE' });
+            listarPets();
+        }
+    }
+
+    // Inicialização
+    listarPets();
+</script>
+
+</body>
+</html>
