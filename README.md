@@ -1,14 +1,15 @@
-# 🐾 Sistema de Gestão Pet Shop
+# Sistema de Gestão Pet Shop
 
 Projeto académico desenvolvido para a Faculdade Impacta, focado numa arquitetura de 3 camadas (Full Stack).
+O projeto pode ser executado em qualquer ambiente Python 3.10+, sendo recomendado o uso do PyCharm ou VS Code.
 
-## 🚀 Tecnologias
+## Tecnologias
 
 * **Front-end:** HTML5, CSS3 e JavaScript.
 * **Back-end:** Python com framework FastAPI.
 * **Banco de Dados:** PostgreSQL hospedado no Neon.tech (SQLAlchemy ORM).
 
-## 🛠️ Como rodar o projeto
+## Como rodar o projeto
 
 1. **Instale as dependências:**
    ```bash
@@ -24,7 +25,7 @@ uvicorn projeto_impacta:app --reload
 
 4. Aceda ao sistema:
 Abra o ficheiro index.html no seu navegador.
-5. 
+
 ### 🗄️ Persistência de Dados
 Os dados estão sendo persistidos em uma instância gerenciada de PostgreSQL no Neon.tech. 
 Isso permite que a aplicação seja testada sem a necessidade de um servidor de banco de dados local.
