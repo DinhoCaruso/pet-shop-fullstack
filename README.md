@@ -16,17 +16,16 @@ O projeto pode ser executado em qualquer ambiente Python 3.10+, sendo recomendad
    pip install fastapi sqlalchemy uvicorn psycopg2-binary
    
 2. Entre na pasta do projeto:
-
+    ```bash
 cd Faculdade
 
 3. Inicie o servidor:
-
+    ```bash
 uvicorn projeto_impacta:app --reload
 
 4. Aceda ao sistema:
 Abra o ficheiro index.html no seu navegador.
 
-<<<<<<< HEAD:README.md
 ### 🗄️ Persistência de Dados
 
 Os dados estão sendo persistidos em uma instância gerenciada de PostgreSQL no Neon.tech. 
