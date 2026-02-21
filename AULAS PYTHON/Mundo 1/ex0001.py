@@ -1,3 +1,0 @@
-#DESAFIO 001 (AULA 04)
-#CRIE UM PROGRAMA QUE ESCREVA 'OLÁ, MUNDO!' NA TELA.
-print('Olá, mundo!')
