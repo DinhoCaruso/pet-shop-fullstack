@@ -17,11 +17,11 @@ O projeto pode ser executado em qualquer ambiente Python 3.10+, sendo recomendad
    
 2. Entre na pasta do projeto:
     ```bash
-cd Faculdade
+    cd Faculdade
 
 3. Inicie o servidor:
     ```bash
-uvicorn projeto_impacta:app --reload
+    uvicorn projeto_impacta:app --reload
 
 4. Aceda ao sistema:
 Abra o ficheiro index.html no seu navegador.
