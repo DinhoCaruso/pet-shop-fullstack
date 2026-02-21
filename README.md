@@ -28,8 +28,6 @@ Abra o ficheiro index.html no seu navegador.
 
 <<<<<<< HEAD:README.md
 ### 🗄️ Persistência de Dados
-=======
-### Persistência de Dados
->>>>>>> 96abd4a8982368cdefe258cea2c9f6dfe577e35f:Faculdade/README.md
+
 Os dados estão sendo persistidos em uma instância gerenciada de PostgreSQL no Neon.tech. 
 Isso permite que a aplicação seja testada sem a necessidade de um servidor de banco de dados local.
