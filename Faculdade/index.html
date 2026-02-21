@@ -2,31 +2,34 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Pet Shop Impacta - Gestão Completa</title>
+    <title>Cadastro - Dinho's Pet Shop</title>
     <style>
         body {
             font-family: 'Segoe UI', sans-serif;
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 40px 20px;
-            /* Configuração da Imagem de Fundo */
+            margin: 0;
+            padding: 0;
             background-image: url('cute-pet-accessories-still-life-concept.jpg');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
             background-repeat: no-repeat;
             min-height: 100vh;
+            display: flex;
+            align-items: flex-start;
+            justify-content: flex-start;
         }
 
         .card {
-            background: rgba(255, 255, 255, 0.92);
-            padding: 25px;
+            background: rgba(255, 255, 255, 0.94);
+            padding: 30px;
             border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            backdrop-filter: blur(8px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+            width: 380px;
+            margin: 40px;
         }
 
-        h2 { text-align: center; color: #2c3e50; margin-bottom: 20px; }
+        h2 { text-align: center; color: #2c3e50; margin-top: 0; }
         label { display: block; margin-top: 15px; font-weight: bold; color: #444; }
 
         input, select {
@@ -41,26 +44,27 @@
             font-weight: bold; margin-top: 25px; font-size: 16px;
             transition: 0.3s;
         }
+        .btn-principal:hover { background-color: #218838; }
 
-        #lista-pets { margin-top: 30px; }
-
-        .pet-item {
-            background: rgba(255, 255, 255, 0.95);
-            margin-bottom: 12px; padding: 15px; border-radius: 10px;
-            display: flex; justify-content: space-between; align-items: center;
-            border-left: 8px solid #28a745; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        .btn-navegacao {
+            width: 100%; padding: 12px; background-color: #2196F3; color: white;
+            border: none; border-radius: 8px; cursor: pointer;
+            font-weight: bold; margin-top: 12px; font-size: 14px;
+            transition: 0.3s;
         }
 
-        .acoes-btn { display: flex; gap: 8px; }
-
-        .btn-edit { background: #ffc107; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; }
-        .btn-del { background: #dc3545; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; }
+        /* Estilo para o botão de cancelar edição */
+        .btn-cancelar {
+            width: 100%; padding: 10px; background-color: #6c757d; color: white;
+            border: none; border-radius: 8px; cursor: pointer;
+            margin-top: 10px; font-size: 13px;
+        }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <h2>🐾 Dinho's Pet Shop</h2>
+    <h2 id="titulo-form">🐾 Cadastro Pet Shop</h2>
 
     <label>Nome do Pet</label>
     <input type="text" id="nome" placeholder="Ex: Blunt">
@@ -74,101 +78,71 @@
     <label>Nome do Dono</label>
     <input type="text" id="dono" placeholder="Ex: Dinho">
 
-    <button id="btn-acao" class="btn-principal" onclick="processarPet()">Realizar Cadastro</button>
-</div>
+    <button id="btn-acao" class="btn-principal" onclick="processarPet()">Finalizar Cadastro</button>
 
-<div id="lista-pets">
-    <h3 style="color: white; text-shadow: 1px 1px 4px rgba(0,0,0,0.5);">📋 Pets Cadastrados:</h3>
-    <ul id="pets-ul" style="padding: 0;"></ul>
+    <button class="btn-navegacao" onclick="window.location.href='pets.html'">
+        📋 Ver Pets Cadastrados
+    </button>
+
+    <div id="area-cancelar"></div>
 </div>
 
 <script>
     const API_URL = "http://127.0.0.1:8000/pets/";
     let idEmEdicao = null;
 
-    async function listarPets() {
-        try {
-            const response = await fetch(API_URL);
-            const pets = await response.json();
-            const ul = document.getElementById('pets-ul');
-            ul.innerHTML = '';
+    // Detecta se a página foi aberta para EDITAR um pet
+    window.onload = function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('id')) {
+            idEmEdicao = urlParams.get('id');
+            document.getElementById('nome').value = urlParams.get('nome');
+            document.getElementById('especie').value = urlParams.get('especie');
+            document.getElementById('dono').value = urlParams.get('dono');
 
-            pets.forEach(pet => {
-                const icone = pet.especie === 'Cachorro' ? '🐶' : '🐱';
-                const li = document.createElement('li');
-                li.className = 'pet-item';
-                li.innerHTML = `
-                    <div>
-                        <strong>${icone} ${pet.nome}</strong><br>
-                        <small>Proprietário: ${pet.dono}</small>
-                    </div>
-                    <div class="acoes-btn">
-                        <button class="btn-edit" onclick="prepararEdicao(${pet.id}, '${pet.nome}', '${pet.especie}', '${pet.dono}')">✏️</button>
-                        <button class="btn-del" onclick="excluirPet(${pet.id})">🗑️</button>
-                    </div>
-                `;
-                ul.appendChild(li);
-            });
-        } catch (error) {
-            console.error("Erro ao listar:", error);
+            // Muda o visual para modo de EDIÇÃO
+            document.getElementById('titulo-form').innerText = "✏️ Editar Cadastro";
+            const btn = document.getElementById('btn-acao');
+            btn.textContent = "Salvar Alterações";
+            btn.style.backgroundColor = "#ffc107";
+            btn.style.color = "black";
+
+            // Cria botão de cancelar caso o usuário desista de editar
+            const btnCancel = document.createElement('button');
+            btnCancel.textContent = "Cancelar e Voltar";
+            btnCancel.className = "btn-cancelar";
+            btnCancel.onclick = () => window.location.href = 'index.html';
+            document.getElementById('area-cancelar').appendChild(btnCancel);
         }
-    }
+    };
 
     async function processarPet() {
         const nome = document.getElementById('nome').value;
         const especie = document.getElementById('especie').value;
         const dono = document.getElementById('dono').value;
 
-        if (!nome || !dono) { alert("Preencha todos os campos!"); return; }
+        if (!nome || !dono) {
+            alert("Por favor, preencha todos os campos!");
+            return;
+        }
 
+        // Se tiver um ID, usa PUT (atualizar), se não, usa POST (criar)
         const metodo = idEmEdicao ? 'PUT' : 'POST';
         const urlFinal = idEmEdicao ? `${API_URL}${idEmEdicao}` : API_URL;
-        const queryParams = `?nome=${nome}&especie=${especie}&dono=${dono}`;
+        const queryParams = `?nome=${encodeURIComponent(nome)}&especie=${encodeURIComponent(especie)}&dono=${encodeURIComponent(dono)}`;
 
         try {
             const response = await fetch(urlFinal + queryParams, { method: metodo });
             if (response.ok) {
-                alert(idEmEdicao ? "Atualizado com sucesso!" : "Cadastrado com sucesso!");
-                cancelarEdicao();
-                listarPets();
+                alert(idEmEdicao ? "Atualizado com sucesso" : "Cadastrado com sucesso! 🚀");
+                window.location.href = 'pets.html'; // Redireciona para a lista
+            } else {
+                alert("Erro ao processar dados.");
             }
         } catch (error) {
-            alert("Erro de conexão com o servidor!");
+            alert("Erro de conexão! Verifique se o servidor Python está rodando.");
         }
     }
-
-    function prepararEdicao(id, nome, especie, dono) {
-        idEmEdicao = id;
-        document.getElementById('nome').value = nome;
-        document.getElementById('especie').value = especie;
-        document.getElementById('dono').value = dono;
-
-        const btn = document.getElementById('btn-acao');
-        btn.textContent = "Salvar Alterações";
-        btn.style.backgroundColor = "#ffc107";
-        btn.style.color = "#000";
-        window.scrollTo(0, 0); // Sobe a página para o formulário
-    }
-
-    function cancelarEdicao() {
-        idEmEdicao = null;
-        document.getElementById('nome').value = '';
-        document.getElementById('dono').value = '';
-        const btn = document.getElementById('btn-acao');
-        btn.textContent = "Cadastrar no Banco de Dados";
-        btn.style.backgroundColor = "#28a745";
-        btn.style.color = "#fff";
-    }
-
-    async function excluirPet(id) {
-        if (confirm("Deseja remover este pet da lista?")) {
-            await fetch(`${API_URL}${id}`, { method: 'DELETE' });
-            listarPets();
-        }
-    }
-
-    // Inicialização
-    listarPets();
 </script>
 
 </body>
