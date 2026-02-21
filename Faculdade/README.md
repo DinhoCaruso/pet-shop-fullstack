@@ -24,3 +24,7 @@ uvicorn projeto_impacta:app --reload
 
 4. Aceda ao sistema:
 Abra o ficheiro index.html no seu navegador.
+5. 
+### 🗄️ Persistência de Dados
+Os dados estão sendo persistidos em uma instância gerenciada de PostgreSQL no Neon.tech. 
+Isso permite que a aplicação seja testada sem a necessidade de um servidor de banco de dados local.
