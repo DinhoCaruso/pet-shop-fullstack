@@ -15,16 +15,16 @@ Projeto académico desenvolvido para a Faculdade Impacta, focado numa arquitetur
    pip install fastapi sqlalchemy uvicorn psycopg2-binary
    
 2. Entre na pasta do projeto:
-Bash
+
 cd Faculdade
 
 3. Inicie o servidor:
-Bash
+
 uvicorn projeto_impacta:app --reload
 
 4. Aceda ao sistema:
 Abra o ficheiro index.html no seu navegador.
-5. 
+
 ### Persistência de Dados
 Os dados estão sendo persistidos em uma instância gerenciada de PostgreSQL no Neon.tech. 
 Isso permite que a aplicação seja testada sem a necessidade de um servidor de banco de dados local.
