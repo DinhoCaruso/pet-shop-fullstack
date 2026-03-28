@@ -1,32 +1,33 @@
-# Sistema de Gestão Pet Shop
+Sistema de Gestao Pet Shop
+Projeto academico desenvolvido para a Faculdade Impacta, focado em uma arquitetura de 3 camadas (Full Stack) e metodologias ageis. O projeto pode ser executado em qualquer ambiente Python 3.10+, sendo recomendado o uso do PyCharm ou VS Code.
 
-Projeto académico desenvolvido para a Faculdade Impacta, focado numa arquitetura de 3 camadas (Full Stack).
-O projeto pode ser executado em qualquer ambiente Python 3.10+, sendo recomendado o uso do PyCharm ou VS Code.
+Funcionalidade Agil: Busca Dinamica
+Seguindo os principios do Manifesto Agil, implementamos uma busca em tempo real que prioriza a interacao com o usuario e a entrega de valor. Esta funcao abrange as 3 camadas do projeto:
 
-## Tecnologias
+Front-end: Campo de pesquisa com evento onkeyup no arquivo pets.html para filtragem instantanea.
 
-* **Front-end:** HTML5, CSS3 e JavaScript.
-* **Back-end:** Python com framework FastAPI.
-* **Banco de Dados:** PostgreSQL hospedado no Neon.tech (SQLAlchemy ORM).
+Back-end: Rota dedicada /pets/search/ no FastAPI para processamento logico do filtro.
 
-## Como rodar o projeto
+Banco de Dados: Consulta otimizada com o operador ilike no PostgreSQL (Neon.tech), garantindo buscas flexiveis na nuvem.
 
-1. **Instale as dependências:**
-   ```bash
-   pip install fastapi sqlalchemy uvicorn psycopg2-binary
-   
-2. Entre na pasta do projeto:
-    ```bash
-    cd Faculdade
+Tecnologias
+Front-end: HTML5, CSS3 e JavaScript.
 
-3. Inicie o servidor:
-    ```bash
-    uvicorn projeto_impacta:app --reload
+Back-end: Python com framework FastAPI.
 
-4. Aceda ao sistema:
-Abra o ficheiro index.html no seu navegador.
+Banco de Dados: PostgreSQL hospedado no Neon.tech (SQLAlchemy ORM).
 
-### 🗄️ Persistência de Dados
+Como rodar o projeto
+Instale as dependencias:
+pip install fastapi sqlalchemy uvicorn psycopg2-binary
 
-Os dados estão sendo persistidos em uma instância gerenciada de PostgreSQL no Neon.tech. 
-Isso permite que a aplicação seja testada sem a necessidade de um servidor de banco de dados local.
+Entre na pasta do projeto:
+cd Faculdade
+
+Inicie o servidor:
+uvicorn projeto_impacta:app --reload
+
+Acesse o sistema: Abra o arquivo index.html no seu navegador.
+
+Persistencia de Dados
+Os dados estao sendo persistidos em uma instancia gerenciada de PostgreSQL no Neon.tech. Isso permite que a aplicacao seja testada sem a necessidade de um servidor de banco de dados local, garantindo que as informacoes do Pet Shop estejam sempre seguras e disponiveis na nuvem.
