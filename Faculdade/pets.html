@@ -20,7 +20,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
 
         .btn-voltar {
@@ -37,6 +37,21 @@
         .btn-voltar:hover { background-color: #eee; }
 
         h2 { color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.6); margin: 0; }
+
+        /* Estilo da Barra de Pesquisa */
+        .search-container {
+            margin-bottom: 30px;
+        }
+
+        #buscaNome {
+            width: 100%;
+            padding: 15px;
+            border-radius: 12px;
+            border: none;
+            font-size: 16px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            outline: none;
+        }
 
         #lista-pets { margin-top: 20px; }
 
@@ -63,21 +78,23 @@
             padding: 10px 15px; border-radius: 8px; cursor: pointer;
             font-weight: bold; transition: 0.3s;
         }
-        .btn-edit:hover { background: #e0a800; }
 
         .btn-del {
             background: #dc3545; color: white; border: none;
             padding: 10px 15px; border-radius: 8px; cursor: pointer;
             transition: 0.3s;
         }
-        .btn-del:hover { background: #a71d2a; }
     </style>
 </head>
 <body>
 
 <div class="header-container">
-    <h2>📋 Pets Cadastrados no Sistema</h2>
-    <a href="index.html" class="btn-voltar">⬅️ Voltar para Cadastro</a>
+    <h2>📋 Gestão de Pets</h2>
+    <a href="index.html" class="btn-voltar">⬅️ Novo Cadastro</a>
+</div>
+
+<div class="search-container">
+    <input type="text" id="buscaNome" placeholder="🔍 Digite o nome do pet para pesquisar..." onkeyup="filtrarPets()">
 </div>
 
 <div id="lista-pets">
@@ -87,36 +104,62 @@
 <script>
     const API_URL = "http://127.0.0.1:8000/pets/";
 
+    // Função para renderizar a lista (centralizada para evitar repetição de código)
+    function renderizarLista(pets) {
+        const ul = document.getElementById('pets-ul');
+        ul.innerHTML = '';
+
+        if (pets.length === 0) {
+            ul.innerHTML = '<p style="color: white; text-align: center; font-size: 1.2em;">Nenhum pet encontrado.</p>';
+            return;
+        }
+
+        pets.forEach(pet => {
+            const icone = pet.especie === 'Cachorro' ? '🐶' : '🐱';
+            const li = document.createElement('li');
+            li.className = 'pet-item';
+            li.innerHTML = `
+                <div class="pet-info">
+                    <strong>${icone} ${pet.nome}</strong><br>
+                    <small>Dono: ${pet.dono}</small>
+                </div>
+                <div class="acoes-btn">
+                    <button class="btn-edit" onclick="editarPet(${pet.id}, '${pet.nome}', '${pet.especie}', '${pet.dono}')">✏️ Editar</button>
+                    <button class="btn-del" onclick="excluirPet(${pet.id})">🗑️ Excluir</button>
+                </div>
+            `;
+            ul.appendChild(li);
+        });
+    }
+
+    // LISTAR TODOS (Início)
     async function listarPets() {
         try {
             const response = await fetch(API_URL);
             const pets = await response.json();
-            const ul = document.getElementById('pets-ul');
-            ul.innerHTML = '';
-
-            if (pets.length === 0) {
-                ul.innerHTML = '<p style="color: white; text-align: center; font-size: 1.2em;">Nenhum pet encontrado no banco de dados.</p>';
-                return;
-            }
-
-            pets.forEach(pet => {
-                const icone = pet.especie === 'Cachorro' ? '🐶' : '🐱';
-                const li = document.createElement('li');
-                li.className = 'pet-item';
-                li.innerHTML = `
-                    <div class="pet-info">
-                        <strong>${icone} ${pet.nome}</strong><br>
-                        <small>Proprietário: ${pet.dono}</small>
-                    </div>
-                    <div class="acoes-btn">
-                        <button class="btn-edit" onclick="editarPet(${pet.id}, '${pet.nome}', '${pet.especie}', '${pet.dono}')">✏️ Editar</button>
-                        <button class="btn-del" onclick="excluirPet(${pet.id})">🗑️ Excluir</button>
-                    </div>
-                `;
-                ul.appendChild(li);
-            });
+            renderizarLista(pets);
         } catch (error) {
-            console.error("Erro ao conectar com o Neon:", error);
+            console.error("Erro ao carregar lista:", error);
+        }
+    }
+
+    // BUSCA FILTRADA (Nova Função - Atende as 3 camadas)
+    async function filtrarPets() {
+        const nomeBusca = document.getElementById('buscaNome').value;
+
+        // Se a barra estiver vazia, mostra todo mundo de novo
+        if (nomeBusca.trim() === "") {
+            listarPets();
+            return;
+        }
+
+        try {
+            // Chama a nova rota de busca que criamos no Python
+            const response = await fetch(`${API_URL}search/${nomeBusca}`);
+            const pets_filtrados = await response.json();
+            renderizarLista(pets_filtrados);
+        } catch (error) {
+            console.error("Erro na busca filtrada:", error);
         }
     }
 
@@ -125,17 +168,16 @@
     }
 
     async function excluirPet(id) {
-        if (confirm("Deseja remover este pet permanentemente do banco de dados na nuvem?")) {
+        if (confirm("Deseja excluir este pet da nuvem?")) {
             try {
                 await fetch(`${API_URL}${id}`, { method: 'DELETE' });
                 listarPets();
             } catch (error) {
-                alert("Erro ao excluir o pet.");
+                alert("Erro ao excluir.");
             }
         }
     }
 
-    // Inicializa a lista ao carregar a página
     window.onload = listarPets;
 </script>
 
