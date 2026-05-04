@@ -77,7 +77,7 @@
     <label>Nome do Dono</label>
     <input type="text" id="dono" placeholder="Ex: Dinho">
 
-    <label>📅 Data da Próxima Tosa</label>
+    <label>📅 Data da Próxima Tosa (Opcional)</label>
     <input type="date" id="data_tosa">
 
     <button id="btn-acao" class="btn-principal" onclick="processarPet()">Finalizar Cadastro</button>
@@ -100,7 +100,12 @@
             document.getElementById('nome').value = urlParams.get('nome');
             document.getElementById('especie').value = urlParams.get('especie');
             document.getElementById('dono').value = urlParams.get('dono');
-            document.getElementById('data_tosa').value = urlParams.get('data_tosa');
+
+            // Verifica se a data é válida antes de preencher
+            const dataVinda = urlParams.get('data_tosa');
+            if (dataVinda && dataVinda !== "null" && dataVinda !== "undefined") {
+                document.getElementById('data_tosa').value = dataVinda;
+            }
 
             document.getElementById('titulo-form').innerText = "✏️ Editar Cadastro";
             const btn = document.getElementById('btn-acao');
@@ -122,16 +127,22 @@
         const dono = document.getElementById('dono').value;
         const data_tosa = document.getElementById('data_tosa').value;
 
-        if (!nome || !dono || !data_tosa) {
-            alert("Por favor, preencha todos os campos, incluindo a data da tosa!");
+        // Ajuste Ágil: Apenas nome e dono são obrigatórios agora
+        if (!nome || !dono) {
+            alert("Por favor, preencha o nome do pet e do dono!");
             return;
         }
 
         const metodo = idEmEdicao ? 'PUT' : 'POST';
         const urlFinal = idEmEdicao ? `${API_URL}${idEmEdicao}` : API_URL;
 
-        // Adicionando o parâmetro da data na query string para o FastAPI
-        const queryParams = `?nome=${encodeURIComponent(nome)}&especie=${encodeURIComponent(especie)}&dono=${encodeURIComponent(dono)}&data_tosa=${encodeURIComponent(data_tosa)}`;
+        // Montagem da URL com parâmetros
+        let queryParams = `?nome=${encodeURIComponent(nome)}&especie=${encodeURIComponent(especie)}&dono=${encodeURIComponent(dono)}`;
+
+        // Só adiciona a data se ela foi preenchida
+        if (data_tosa) {
+            queryParams += `&data_tosa=${encodeURIComponent(data_tosa)}`;
+        }
 
         try {
             const response = await fetch(urlFinal + queryParams, { method: metodo });

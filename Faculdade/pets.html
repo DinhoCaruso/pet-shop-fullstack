@@ -70,6 +70,7 @@
         .pet-info strong { font-size: 1.2em; color: #2c3e50; }
         .pet-info small { color: #666; font-size: 0.9em; }
         .data-tosa-info { color: #28a745; font-weight: bold; font-size: 0.85em; margin-top: 5px; display: block; }
+        .sem-data { color: #888; font-style: italic; }
 
         .acoes-btn { display: flex; gap: 10px; }
 
@@ -115,8 +116,15 @@
 
         pets.forEach(pet => {
             const icone = pet.especie === 'Cachorro' ? '🐶' : '🐱';
-            // Formatação básica da data (YYYY-MM-DD para DD/MM/YYYY)
-            const dataFormatada = pet.data_tosa.split('-').reverse().join('/');
+
+            // Ajuste Ágil: Verifica se existe data para formatar, caso contrário exibe aviso
+            let dataDisplay = "";
+            if (pet.data_tosa && pet.data_tosa !== "undefined" && pet.data_tosa !== "") {
+                const dataFormatada = pet.data_tosa.split('-').reverse().join('/');
+                dataDisplay = `<span class="data-tosa-info">✂️ Próxima Tosa: ${dataFormatada}</span>`;
+            } else {
+                dataDisplay = `<span class="data-tosa-info sem-data">✂️ Tosa: Não agendada</span>`;
+            }
 
             const li = document.createElement('li');
             li.className = 'pet-item';
@@ -124,10 +132,10 @@
                 <div class="pet-info">
                     <strong>${icone} ${pet.nome}</strong><br>
                     <small>Dono: ${pet.dono}</small><br>
-                    <span class="data-tosa-info">✂️ Próxima Tosa: ${dataFormatada}</span>
+                    ${dataDisplay}
                 </div>
                 <div class="acoes-btn">
-                    <button class="btn-edit" onclick="editarPet(${pet.id}, '${pet.nome}', '${pet.especie}', '${pet.dono}', '${pet.data_tosa}')">✏️ Editar</button>
+                    <button class="btn-edit" onclick="editarPet(${pet.id}, '${pet.nome}', '${pet.especie}', '${pet.dono}', '${pet.data_tosa || ''}')">✏️ Editar</button>
                     <button class="btn-del" onclick="excluir_pet(${pet.id})">🗑️ Excluir</button>
                 </div>
             `;
@@ -162,7 +170,6 @@
         }
     }
 
-    // Atualizado para levar a data da tosa de volta para o formulário
     function editarPet(id, nome, especie, dono, data_tosa) {
         window.location.href = `index.html?id=${id}&nome=${encodeURIComponent(nome)}&especie=${encodeURIComponent(especie)}&dono=${encodeURIComponent(dono)}&data_tosa=${encodeURIComponent(data_tosa)}`;
     }
