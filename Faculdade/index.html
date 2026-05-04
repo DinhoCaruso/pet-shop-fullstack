@@ -53,7 +53,6 @@
             transition: 0.3s;
         }
 
-        /* Estilo para o botão de cancelar edição */
         .btn-cancelar {
             width: 100%; padding: 10px; background-color: #6c757d; color: white;
             border: none; border-radius: 8px; cursor: pointer;
@@ -78,6 +77,9 @@
     <label>Nome do Dono</label>
     <input type="text" id="dono" placeholder="Ex: Dinho">
 
+    <label>📅 Data da Próxima Tosa</label>
+    <input type="date" id="data_tosa">
+
     <button id="btn-acao" class="btn-principal" onclick="processarPet()">Finalizar Cadastro</button>
 
     <button class="btn-navegacao" onclick="window.location.href='pets.html'">
@@ -91,7 +93,6 @@
     const API_URL = "http://127.0.0.1:8000/pets/";
     let idEmEdicao = null;
 
-    // Detecta se a página foi aberta para EDITAR um pet
     window.onload = function() {
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.has('id')) {
@@ -99,15 +100,14 @@
             document.getElementById('nome').value = urlParams.get('nome');
             document.getElementById('especie').value = urlParams.get('especie');
             document.getElementById('dono').value = urlParams.get('dono');
+            document.getElementById('data_tosa').value = urlParams.get('data_tosa');
 
-            // Muda o visual para modo de EDIÇÃO
             document.getElementById('titulo-form').innerText = "✏️ Editar Cadastro";
             const btn = document.getElementById('btn-acao');
             btn.textContent = "Salvar Alterações";
             btn.style.backgroundColor = "#ffc107";
             btn.style.color = "black";
 
-            // Cria botão de cancelar caso o usuário desista de editar
             const btnCancel = document.createElement('button');
             btnCancel.textContent = "Cancelar e Voltar";
             btnCancel.className = "btn-cancelar";
@@ -120,22 +120,24 @@
         const nome = document.getElementById('nome').value;
         const especie = document.getElementById('especie').value;
         const dono = document.getElementById('dono').value;
+        const data_tosa = document.getElementById('data_tosa').value;
 
-        if (!nome || !dono) {
-            alert("Por favor, preencha todos os campos!");
+        if (!nome || !dono || !data_tosa) {
+            alert("Por favor, preencha todos os campos, incluindo a data da tosa!");
             return;
         }
 
-        // Se tiver um ID, usa PUT (atualizar), se não, usa POST (criar)
         const metodo = idEmEdicao ? 'PUT' : 'POST';
         const urlFinal = idEmEdicao ? `${API_URL}${idEmEdicao}` : API_URL;
-        const queryParams = `?nome=${encodeURIComponent(nome)}&especie=${encodeURIComponent(especie)}&dono=${encodeURIComponent(dono)}`;
+
+        // Adicionando o parâmetro da data na query string para o FastAPI
+        const queryParams = `?nome=${encodeURIComponent(nome)}&especie=${encodeURIComponent(especie)}&dono=${encodeURIComponent(dono)}&data_tosa=${encodeURIComponent(data_tosa)}`;
 
         try {
             const response = await fetch(urlFinal + queryParams, { method: metodo });
             if (response.ok) {
                 alert(idEmEdicao ? "Atualizado com sucesso" : "Cadastrado com sucesso! 🚀");
-                window.location.href = 'pets.html'; // Redireciona para a lista
+                window.location.href = 'pets.html';
             } else {
                 alert("Erro ao processar dados.");
             }

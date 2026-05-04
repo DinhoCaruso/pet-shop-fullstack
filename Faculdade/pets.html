@@ -38,7 +38,6 @@
 
         h2 { color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.6); margin: 0; }
 
-        /* Estilo da Barra de Pesquisa */
         .search-container {
             margin-bottom: 30px;
         }
@@ -70,6 +69,7 @@
 
         .pet-info strong { font-size: 1.2em; color: #2c3e50; }
         .pet-info small { color: #666; font-size: 0.9em; }
+        .data-tosa-info { color: #28a745; font-weight: bold; font-size: 0.85em; margin-top: 5px; display: block; }
 
         .acoes-btn { display: flex; gap: 10px; }
 
@@ -104,7 +104,6 @@
 <script>
     const API_URL = "http://127.0.0.1:8000/pets/";
 
-    // Função para renderizar a lista (centralizada para evitar repetição de código)
     function renderizarLista(pets) {
         const ul = document.getElementById('pets-ul');
         ul.innerHTML = '';
@@ -116,23 +115,26 @@
 
         pets.forEach(pet => {
             const icone = pet.especie === 'Cachorro' ? '🐶' : '🐱';
+            // Formatação básica da data (YYYY-MM-DD para DD/MM/YYYY)
+            const dataFormatada = pet.data_tosa.split('-').reverse().join('/');
+
             const li = document.createElement('li');
             li.className = 'pet-item';
             li.innerHTML = `
                 <div class="pet-info">
                     <strong>${icone} ${pet.nome}</strong><br>
-                    <small>Dono: ${pet.dono}</small>
+                    <small>Dono: ${pet.dono}</small><br>
+                    <span class="data-tosa-info">✂️ Próxima Tosa: ${dataFormatada}</span>
                 </div>
                 <div class="acoes-btn">
-                    <button class="btn-edit" onclick="editarPet(${pet.id}, '${pet.nome}', '${pet.especie}', '${pet.dono}')">✏️ Editar</button>
-                    <button class="btn-del" onclick="excluirPet(${pet.id})">🗑️ Excluir</button>
+                    <button class="btn-edit" onclick="editarPet(${pet.id}, '${pet.nome}', '${pet.especie}', '${pet.dono}', '${pet.data_tosa}')">✏️ Editar</button>
+                    <button class="btn-del" onclick="excluir_pet(${pet.id})">🗑️ Excluir</button>
                 </div>
             `;
             ul.appendChild(li);
         });
     }
 
-    // LISTAR TODOS (Início)
     async function listarPets() {
         try {
             const response = await fetch(API_URL);
@@ -143,18 +145,15 @@
         }
     }
 
-    // BUSCA FILTRADA (Nova Função - Atende as 3 camadas)
     async function filtrarPets() {
         const nomeBusca = document.getElementById('buscaNome').value;
 
-        // Se a barra estiver vazia, mostra todo mundo de novo
         if (nomeBusca.trim() === "") {
             listarPets();
             return;
         }
 
         try {
-            // Chama a nova rota de busca que criamos no Python
             const response = await fetch(`${API_URL}search/${nomeBusca}`);
             const pets_filtrados = await response.json();
             renderizarLista(pets_filtrados);
@@ -163,11 +162,12 @@
         }
     }
 
-    function editarPet(id, nome, especie, dono) {
-        window.location.href = `index.html?id=${id}&nome=${encodeURIComponent(nome)}&especie=${encodeURIComponent(especie)}&dono=${encodeURIComponent(dono)}`;
+    // Atualizado para levar a data da tosa de volta para o formulário
+    function editarPet(id, nome, especie, dono, data_tosa) {
+        window.location.href = `index.html?id=${id}&nome=${encodeURIComponent(nome)}&especie=${encodeURIComponent(especie)}&dono=${encodeURIComponent(dono)}&data_tosa=${encodeURIComponent(data_tosa)}`;
     }
 
-    async function excluirPet(id) {
+    async function excluir_pet(id) {
         if (confirm("Deseja excluir este pet da nuvem?")) {
             try {
                 await fetch(`${API_URL}${id}`, { method: 'DELETE' });
