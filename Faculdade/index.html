@@ -80,6 +80,13 @@
     <label>📅 Data da Próxima Tosa (Opcional)</label>
     <input type="date" id="data_tosa">
 
+    <!-- Nova Feature: Campo de seleção para status vacinal -->
+    <label>💉 Status de Vacinação</label>
+    <select id="vacinado">
+        <option value="Não">Não Vacinado ❌</option>
+        <option value="Sim">Vacinado 💉</option>
+    </select>
+
     <button id="btn-acao" class="btn-principal" onclick="processarPet()">Finalizar Cadastro</button>
 
     <button class="btn-navegacao" onclick="window.location.href='pets.html'">
@@ -107,6 +114,12 @@
                 document.getElementById('data_tosa').value = dataVinda;
             }
 
+            // Recupera o status vacinal na edição
+            const vacinadoVindo = urlParams.get('vacinado');
+            if (vacinadoVindo && vacinadoVindo !== "null" && vacinadoVindo !== "undefined") {
+                document.getElementById('vacinado').value = vacinadoVindo;
+            }
+
             document.getElementById('titulo-form').innerText = "✏️ Editar Cadastro";
             const btn = document.getElementById('btn-acao');
             btn.textContent = "Salvar Alterações";
@@ -126,6 +139,7 @@
         const especie = document.getElementById('especie').value;
         const dono = document.getElementById('dono').value;
         const data_tosa = document.getElementById('data_tosa').value;
+        const vacinado = document.getElementById('vacinado').value;
 
         // Ajuste Ágil: Apenas nome e dono são obrigatórios agora
         if (!nome || !dono) {
@@ -136,8 +150,8 @@
         const metodo = idEmEdicao ? 'PUT' : 'POST';
         const urlFinal = idEmEdicao ? `${API_URL}${idEmEdicao}` : API_URL;
 
-        // Montagem da URL com parâmetros
-        let queryParams = `?nome=${encodeURIComponent(nome)}&especie=${encodeURIComponent(especie)}&dono=${encodeURIComponent(dono)}`;
+        // Montagem da URL com parâmetros incluindo o novo status vacinal
+        let queryParams = `?nome=${encodeURIComponent(nome)}&especie=${encodeURIComponent(especie)}&dono=${encodeURIComponent(dono)}&vacinado=${encodeURIComponent(vacinado)}`;
 
         // Só adiciona a data se ela foi preenchida
         if (data_tosa) {

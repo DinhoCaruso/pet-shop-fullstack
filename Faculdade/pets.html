@@ -72,6 +72,9 @@
         .data-tosa-info { color: #28a745; font-weight: bold; font-size: 0.85em; margin-top: 5px; display: block; }
         .sem-data { color: #888; font-style: italic; }
 
+        /* Nova classe para estilizar o status da vacina */
+        .vacina-info { font-weight: bold; font-size: 0.85em; display: inline-block; margin-top: 3px; }
+
         .acoes-btn { display: flex; gap: 10px; }
 
         .btn-edit {
@@ -126,6 +129,11 @@
                 dataDisplay = `<span class="data-tosa-info sem-data">✂️ Tosa: Não agendada</span>`;
             }
 
+            // Nova Lógica: Processa e exibe visualmente se está vacinado ou não
+            const vacinaDisplay = pet.vacinado === 'Sim'
+                ? `<span class="vacina-info" style="color: #28a745;">🟢 Status: Vacinado</span>`
+                : `<span class="vacina-info" style="color: #dc3545;">🔴 Status: Não Vacinado</span>`;
+
             const li = document.createElement('li');
             li.className = 'pet-item';
             li.innerHTML = `
@@ -133,9 +141,10 @@
                     <strong>${icone} ${pet.nome}</strong><br>
                     <small>Dono: ${pet.dono}</small><br>
                     ${dataDisplay}
+                    ${vacinaDisplay}
                 </div>
                 <div class="acoes-btn">
-                    <button class="btn-edit" onclick="editarPet(${pet.id}, '${pet.nome}', '${pet.especie}', '${pet.dono}', '${pet.data_tosa || ''}')">✏️ Editar</button>
+                    <button class="btn-edit" onclick="editarPet(${pet.id}, '${pet.nome}', '${pet.especie}', '${pet.dono}', '${pet.data_tosa || ''}', '${pet.vacinado || 'Não'}')">✏️ Editar</button>
                     <button class="btn-del" onclick="excluir_pet(${pet.id})">🗑️ Excluir</button>
                 </div>
             `;
@@ -170,8 +179,9 @@
         }
     }
 
-    function editarPet(id, nome, especie, dono, data_tosa) {
-        window.location.href = `index.html?id=${id}&nome=${encodeURIComponent(nome)}&especie=${encodeURIComponent(especie)}&dono=${encodeURIComponent(dono)}&data_tosa=${encodeURIComponent(data_tosa)}`;
+    // Atualizado para carregar também o status vacinado de volta na URL
+    function editarPet(id, nome, especie, dono, data_tosa, vacinado) {
+        window.location.href = `index.html?id=${id}&nome=${encodeURIComponent(nome)}&especie=${encodeURIComponent(especie)}&dono=${encodeURIComponent(dono)}&data_tosa=${encodeURIComponent(data_tosa)}&vacinado=${encodeURIComponent(vacinado)}`;
     }
 
     async function excluir_pet(id) {

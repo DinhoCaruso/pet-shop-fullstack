@@ -2,7 +2,7 @@
 # PROJETO FACULDADE IMPACTA - GESTÃO DE PET SHOP
 # Aluno: Dinho
 # Matéria: Desenvolvimento Full Stack
-# Funcionalidade: Agendamento de Tosa (Manifesto Ágil)
+# Funcionalidades: Agendamento de Tosa e Status de Vacinação (Manifesto Ágil)
 # ==========================================================
 
 from fastapi import FastAPI, Depends
@@ -18,7 +18,7 @@ engine = create_engine(SQLALCHEMY_DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
-# Ajuste: data_tosa agora permite valores vazios (nullable=True)
+# Modelo atualizado: Inclui a coluna para controle de vacinação
 class Pet(Base):
     __tablename__ = "pets"
     id = Column(Integer, primary_key=True, index=True)
@@ -26,6 +26,7 @@ class Pet(Base):
     especie = Column(String)
     dono = Column(String)
     data_tosa = Column(String, nullable=True)
+    vacinado = Column(String, nullable=True) # Nova coluna: 'Sim' ou 'Não'
 
 Base.metadata.create_all(bind=engine)
 
@@ -40,17 +41,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Ajuste: data_tosa agora é opcional (Optional[str] = None)
+# Rota POST atualizada para incluir o parâmetro de vacinação
 @app.post("/pets/")
-def cadastrar_pet(nome: str, especie: str, dono: str, data_tosa: Optional[str] = None):
+def cadastrar_pet(nome: str, especie: str, dono: str, data_tosa: Optional[str] = None, vacinado: Optional[str] = "Não"):
     db = SessionLocal()
     try:
-        novo_pet = Pet(nome=nome, especie=especie, dono=dono, data_tosa=data_tosa)
+        novo_pet = Pet(nome=nome, especie=especie, dono=dono, data_tosa=data_tosa, vacinado=vacinado)
         db.add(novo_pet)
         db.commit()
         db.refresh(novo_pet)
-        msg = f"{nome} cadastrado!" if not data_tosa else f"{nome} cadastrado com tosa para {data_tosa}!"
-        return {"status": "sucesso", "mensagem": msg}
+        return {"status": "sucesso", "mensagem": f"{nome} cadastrado com sucesso!"}
     except Exception as e:
         return {"status": "erro", "mensagem": str(e)}
     finally:
@@ -88,9 +88,9 @@ def excluir_pet(pet_id: int):
     finally:
         db.close()
 
-# Ajuste: data_tosa agora é opcional na edição também
+# Rota PUT atualizada para permitir atualizar o status da vacina
 @app.put("/pets/{pet_id}")
-def editar_pet(pet_id: int, nome: str, especie: str, dono: str, data_tosa: Optional[str] = None):
+def editar_pet(pet_id: int, nome: str, especie: str, dono: str, data_tosa: Optional[str] = None, vacinado: Optional[str] = "Não"):
     db = SessionLocal()
     try:
         pet = db.query(Pet).filter(Pet.id == pet_id).first()
@@ -99,8 +99,9 @@ def editar_pet(pet_id: int, nome: str, especie: str, dono: str, data_tosa: Optio
             pet.especie = especie
             pet.dono = dono
             pet.data_tosa = data_tosa
+            pet.vacinado = vacinado
             db.commit()
-            return {"status": "sucesso", "mensagem": "Dados atualizados!"}
+            return {"status": "sucesso", "mensagem": "Dados atualizados com sucesso!"}
         return {"status": "erro", "mensagem": "Pet não encontrado"}
     finally:
         db.close()
